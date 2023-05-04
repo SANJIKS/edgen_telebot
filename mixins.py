@@ -26,10 +26,8 @@ def get_all_univers():
     
 
 def get_about_univers(id):
-    print(id)
-    response = requests.get('http://13.51.255.44/university/{id}/')
+    response = requests.get(f'http://13.51.255.44/university/{id}/')
     if response.status_code == 200:
-        print(json.loads(response.text))
         return json.loads(response.text)
     else:
         return 'Error'

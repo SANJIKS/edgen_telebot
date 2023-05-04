@@ -43,7 +43,7 @@ def get_one_news(call):
     chat_id = call.message.chat.id
     slug = call.data.split('+')[1]
     news = get_retrieve_news(slug)
-    bot.send_message(chat_id, text=f'{news["title"]}\nОписание: {news["description"]}\n\nhttp://13.51.255.44/article/{slug}')
+    bot.send_message(chat_id, text=f'{news["title"]}\nОписание: {news["description"]}\n\nhttp://13.51.255.44/article/{slug}', reply_markup=get_keyboard())
 
 
 
@@ -62,19 +62,16 @@ def get_univers(call):
 @bot.callback_query_handler(func=lambda call: call.data.startswith('id+'))
 def send_keyboard_message(call):
     chat_id = call.message.chat.id
-    print(call.data)
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(types.InlineKeyboardButton(text='Новости универа', callback_data='about_'+str(call.data.split('+'))[1]), types.InlineKeyboardButton(text='Об университете', callback_data='info_'+str(call.data.split('+')[1])))
-    print(call.data.split('+')[1])
     bot.send_message(chat_id, text='Что хотите узнать?', reply_markup=keyboard)
 
 
-@bot.callback_query_handler(func=lambda call: call.data.startswith('id_un_'))
+@bot.callback_query_handler(func=lambda call: call.data.startswith('info_'))
 def get_about(call):
     chat_id = call.message.chat.id
-    print(call.data)
-    id = call.data.split('_')[2]
+    id = call.data.split('_')[1]
     info = get_about_univers(id)
-    bot.send_message(chat_id, text=f'Название: {info.name}')
+    bot.send_message(chat_id, text=f'Название: {info["name"]}\nОписание: {info["description"]}\nАдрес: {info["address"]}\nЭлектронная почта: {info["email"]}\nСсылка на универ: http://13.51.255.44/university/{id}/', reply_markup=get_keyboard())
 
 bot.polling()
