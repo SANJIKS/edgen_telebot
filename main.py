@@ -2,7 +2,7 @@ import json
 import requests
 import telebot
 from telebot import types
-from mixins import  get_about_univers, get_all_news, get_retrieve_news, get_all_univers
+from mixins import  get_about_univers, get_all_news, get_news_univer, get_retrieve_news, get_all_univers
 
 HOST = 'http://13.51.255.44/'
 
@@ -43,7 +43,7 @@ def get_one_news(call):
     chat_id = call.message.chat.id
     slug = call.data.split('+')[1]
     news = get_retrieve_news(slug)
-    bot.send_message(chat_id, text=f'{news["title"]}\nОписание: {news["description"]}\n\nhttp://13.51.255.44/article/{slug}', reply_markup=get_keyboard())
+    bot.send_message(chat_id, text=f'{news["title"]}\nОписание: {news["description"]}\n\nhttp://13.51.255.44/news/{slug}', reply_markup=get_keyboard())
 
 
 
@@ -63,7 +63,7 @@ def get_univers(call):
 def send_keyboard_message(call):
     chat_id = call.message.chat.id
     keyboard = types.InlineKeyboardMarkup()
-    keyboard.add(types.InlineKeyboardButton(text='Новости универа', callback_data='about_'+str(call.data.split('+'))[1]), types.InlineKeyboardButton(text='Об университете', callback_data='info_'+str(call.data.split('+')[1])))
+    keyboard.add(types.InlineKeyboardButton(text='Новости универа', callback_data='about_'+str(call.data.split('+')[1])), types.InlineKeyboardButton(text='Об университете', callback_data='info_'+str(call.data.split('+')[1])))
     bot.send_message(chat_id, text='Что хотите узнать?', reply_markup=keyboard)
 
 
@@ -73,5 +73,16 @@ def get_about(call):
     id = call.data.split('_')[1]
     info = get_about_univers(id)
     bot.send_message(chat_id, text=f'Название: {info["name"]}\nОписание: {info["description"]}\nАдрес: {info["address"]}\nЭлектронная почта: {info["email"]}\nСсылка на универ: http://13.51.255.44/university/{id}/', reply_markup=get_keyboard())
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith('about_'))
+def get_univer_news(call):
+    chat_id = call.message.chat.id
+    print(call.data)
+    id = call.data.split('_')[1]
+    news = get_news_univer(id)
+
+    for u in news:
+        bot.send_message(chat_id, text=f'{u["title"]}\n\nhttp://13.51.255.44/news/{u["slug"]}', reply_markup=get_keyboard())
 
 bot.polling()
